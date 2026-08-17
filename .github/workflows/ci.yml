@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -60,18 +60,24 @@ jobs:
 
       - name: Get Allure history
         if: always()
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages
+        continue-on-error: true
+        run: |
+          git clone --depth=1 --branch gh-pages https://github.com/${{ github.repository }}.git gh-pages || echo "gh-pages branch not found, starting fresh"
+
+      - name: Install Allure CLI
+        if: always()
+        run: |
+          pip install allure-commandline
 
       - name: Build Allure report
         if: always()
-        uses: simple-elf/allure-report-action@v1.9
-        with:
-          gh_pages: gh-pages
-          allure_history: allure-history
-          allure_results: allure-results
+        run: |
+          # Копируем историю из предыдущего прогона (если есть)
+          if [ -d "gh-pages/history" ]; then
+            mkdir -p allure-results/history
+            cp -r gh-pages/history/* allure-results/history/ || true
+          fi
+          allure generate allure-results -o allure-report --clean
 
       - name: Publish Allure report to GitHub Pages
         if: always()
@@ -79,5 +85,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-history
+          publish_dir: allure-report
           keep_files: true
