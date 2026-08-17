@@ -5,7 +5,7 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
-  workflow_dispatch: # ручной запуск из UI GitHub
+  workflow_dispatch:
 
 jobs:
   test:
@@ -22,49 +22,29 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
-          cache-dependency-path: sbercrm_login_tests/requirements.txt
+          cache-dependency-path: requirements.txt
 
-      - name: Install Chrome and ChromeDriver
+      - name: Install Chrome
         uses: browser-actions/setup-chrome@v1
         with:
           chrome-version: stable
-          install-chromedriver: true
 
       - name: Install dependencies
-        working-directory: sbercrm_login_tests
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run tests with Allure
-        working-directory: sbercrm_login_tests
         env:
           HEADLESS: 'true'
           SBERCRM_BASE_URL: ${{ secrets.SBERCRM_BASE_URL }}
         run: |
           python -m pytest tests/ -q --alluredir=allure-results
 
-      - name: Generate Allure report
-        if: always()
-        working-directory: sbercrm_login_tests
-        run: |
-          pip install allure-pytest
-          # allure CLI через npm-пакет (не требует Java-установки)
-          npm install -g allure-commandline --silent
-          allure generate allure-results -o allure-report --clean
-
-      - name: Upload Allure report artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-report
-          path: sbercrm_login_tests/allure-report
-          retention-days: 14
-
-      - name: Upload Allure results artifact
+      - name: Upload test report (Allure results)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results
-          path: sbercrm_login_tests/allure-results
+          path: allure-results
           retention-days: 14
