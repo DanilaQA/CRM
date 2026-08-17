@@ -67,7 +67,10 @@ jobs:
       - name: Install Allure CLI
         if: always()
         run: |
-          pip install allure-commandline
+          curl -sL https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz -o allure.tgz
+          tar -xzf allure.tgz
+          sudo ln -sf $PWD/allure-2.27.0/bin/allure /usr/local/bin/allure
+          allure --version
 
       - name: Build Allure report
         if: always()
