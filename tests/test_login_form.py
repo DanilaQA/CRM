@@ -64,7 +64,10 @@ def test_login_required_field_validation(login_page, username, password, expecte
     login_page.login(username=username, password=password)
     feedback = _wait_for_login_feedback(login_page)
     assert feedback, "Expected required-field validation feedback, but none appeared"
-    assert _has_any_text(feedback, expected_patterns)
+    assert _has_any_text(feedback, expected_patterns), (
+        f"Feedback text did not match patterns {expected_patterns}. "
+        f"Actual feedback: {feedback!r}"
+    )
 
 
 @allure.epic("Авторизация")
@@ -132,4 +135,6 @@ def test_login_button_disabled_or_validation_on_empty_submit(login_page):
     feedback = _wait_for_login_feedback(login_page, timeout=8)
     assert feedback or login_page.submit().get_attribute("disabled") is not None
     if feedback:
-        assert _has_any_text(feedback, [r"введ", r"обяз", r"required", r"пуст"])
+        assert _has_any_text(feedback, [r"введ", r"обяз", r"required", r"пуст"]), (
+            f"Feedback text did not match patterns. Actual feedback: {feedback!r}"
+        )
