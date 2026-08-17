@@ -54,8 +54,8 @@ allure open allure-report
 2. Устанавливает Chrome и ChromeDriver (`browser-actions/setup-chrome`).
 3. Устанавливает зависимости из `requirements.txt`.
 4. Запускает тесты в headless-режиме (`HEADLESS=true`) со сбором Allure-результатов.
-5. Генерирует Allure-отчёт и загружает его как артефакт `allure-report`.
-6. Загружает сырые результаты `allure-results` как артефакт.
+5. Загружает сырые результаты `allure-results` как артефакт.
+6. Генерирует Allure-отчёт (с историей прогонов) и публикует его на **GitHub Pages**.
 
 ### Как подключить
 
@@ -70,10 +70,20 @@ allure open allure-report
 2. В настройках репозитория (Settings → Secrets and variables → Actions) при необходимости
    добавьте секрет `SBERCRM_BASE_URL` (если URL логина отличается от значения по умолчанию).
 3. Пайплайн запустится автоматически. Отчёт Allure доступен во вкладке **Actions** →
-   выбранный прогон → артефакт `allure-report` (скачать и открыть `index.html`).
+   выбранный прогон → артефакт `allure-results` (скачать и открыть локально).
 
-> Примечание: для публикации отчёта на GitHub Pages можно дополнительно использовать
-> `actions/deploy-pages` или `peaceiris/actions-gh-pages`.
+### Публикация отчёта на GitHub Pages
+
+Пайплайн автоматически публикует Allure-отчёт на GitHub Pages. Чтобы отчёт был доступен:
+
+1. Откройте **Settings → Pages** репозитория.
+2. В разделе **Build and deployment** выберите **Source: Deploy from a branch**.
+3. Выберите ветку **`gh-pages`** и папку **`/ (root)`**.
+4. Сохраните. Отчёт будет доступен по адресу:
+   `https://<user>.github.io/<repo>/`
+
+> Примечание: если репозиторий приватный, отчёт будет доступен только авторизованным
+> пользователям GitHub.
 
 ## Сценарии
 
