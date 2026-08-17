@@ -54,10 +54,11 @@ def test_login_form_is_displayed(login_page):
 @pytest.mark.parametrize(
     "username,password,expected_patterns",
     [
-        # Пустые поля: страница показывает "Введите e-mail" / "Введите пароль"
-        ("", "", [r"введ", r"обяз", r"required", r"пуст"]),
-        ("user@example.com", "", [r"введ", r"обяз", r"required", r"пуст"]),
-        ("", "Password123!", [r"введ", r"обяз", r"required", r"пуст"]),
+        # Пустые поля: страница показывает "Введите e-mail" / "Enter e-mail" и т.п.
+        # (локаль страницы зависит от окружения: RU или EN)
+        ("", "", [r"введ", r"enter", r"обяз", r"required", r"пуст", r"e-mail", r"password"]),
+        ("user@example.com", "", [r"введ", r"enter", r"обяз", r"required", r"пуст", r"e-mail", r"password"]),
+        ("", "Password123!", [r"введ", r"enter", r"обяз", r"required", r"пуст", r"e-mail", r"password"]),
     ],
 )
 def test_login_required_field_validation(login_page, username, password, expected_patterns):
@@ -135,6 +136,8 @@ def test_login_button_disabled_or_validation_on_empty_submit(login_page):
     feedback = _wait_for_login_feedback(login_page, timeout=8)
     assert feedback or login_page.submit().get_attribute("disabled") is not None
     if feedback:
-        assert _has_any_text(feedback, [r"введ", r"обяз", r"required", r"пуст"]), (
+        assert _has_any_text(
+            feedback, [r"введ", r"enter", r"обяз", r"required", r"пуст", r"e-mail", r"password"]
+        ), (
             f"Feedback text did not match patterns. Actual feedback: {feedback!r}"
         )
